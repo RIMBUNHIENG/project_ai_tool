@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Kantumruy+Pro:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-sans: "Inter", "Kantumruy Pro", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --color-brand-bg: #030712;
+  --color-brand-card: #0f172a;
+  --color-brand-accent: #6366f1;
+  --color-brand-accent-hover: #4f46e5;
+  --color-brand-secondary: #1e293b;
+  
+  /* Light Mode Variables */
+  --color-light-bg: #f8fafc;
+  --color-light-card: #ffffff;
+  --color-light-border: #e2e8f0;
+  --color-light-text-primary: #0f172a;
+  --color-light-text-secondary: #475569;
+}
+
+body {
+  @apply antialiased transition-colors duration-300;
+}
+
+.dark body {
+  @apply bg-brand-bg text-slate-200 selection:bg-brand-accent/30 selection:text-white;
+}
+
+body:not(.dark) {
+  @apply bg-slate-50 text-slate-900 selection:bg-brand-accent/20 selection:text-brand-accent;
+}
+
+.glass-panel {
+  @apply backdrop-blur-xl border transition-colors duration-300;
+}
+
+.dark .glass-panel {
+  @apply bg-slate-900/40 border-slate-800/50;
+}
+
+.glass-panel:not(.dark *) {
+  @apply bg-white/70 border-slate-200/60 shadow-sm;
+}
+
+.nav-item-active {
+  @apply transition-all duration-200;
+}
+
+.dark .nav-item-active {
+  @apply bg-brand-accent/10 text-brand-accent border-r-2 border-brand-accent;
+}
+
+.nav-item-active:not(.dark *) {
+  @apply bg-brand-accent/5 text-brand-accent border-r-2 border-brand-accent;
+}
+
+.markdown-body {
+  @apply prose prose-slate max-w-none transition-colors duration-300;
+}
+
+.dark .markdown-body {
+  @apply prose-invert;
+}
+
+.markdown-body pre {
+  @apply bg-brand-card border border-slate-800 rounded-lg p-4 my-4 transition-colors duration-300;
+}
+
+.markdown-body code {
+  @apply font-mono text-brand-accent transition-colors duration-300;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-slate-800 rounded-full hover:bg-slate-700 transition-colors;
+}

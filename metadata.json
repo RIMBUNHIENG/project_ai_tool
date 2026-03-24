@@ -1,0 +1,5 @@
+{
+  "name": "FNB AI PRO",
+  "description": "An AI-powered coding assistant for junior developers, students, and educators, featuring code generation, debugging, testing, and bilingual support.",
+  "requestFramePermissions": ["microphone"]
+}
