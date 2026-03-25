@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { 
-  Code2, 
-  Bug, 
-  TestTube2, 
-  BookOpen, 
-  Send, 
-  Trash2, 
-  Loader2, 
+import {
+  Code2,
+  Bug,
+  TestTube2,
+  BookOpen,
+  Send,
+  Trash2,
+  Loader2,
   Sparkles,
   Cpu,
   Eye,
@@ -65,8 +65,8 @@ export default function App() {
   const [previewDevice, setPreviewDevice] = useState<'mobile' | 'desktop'>('desktop');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
-  const [recentChats, setRecentChats] = useState<{title: string, input: string, output: string, tab: Tab}[]>([]);
-  const [chatHistory, setChatHistory] = useState<{role: 'user' | 'model', parts: {text: string}[]}[]>([]);
+  const [recentChats, setRecentChats] = useState<{ title: string, input: string, output: string, tab: Tab }[]>([]);
+  const [chatHistory, setChatHistory] = useState<{ role: 'user' | 'model', parts: { text: string }[] }[]>([]);
   const [isContinuing, setIsContinuing] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
 
@@ -103,7 +103,7 @@ export default function App() {
     setIsLoading(true);
     const currentInput = input.trim();
     setInput(''); // Clear input immediately for better UX
-    
+
     const userMsg: Message = {
       id: Date.now().toString(),
       role: 'user',
@@ -126,9 +126,9 @@ export default function App() {
     } else {
       setMessages(prev => [...prev, userMsg, assistantMsg]);
     }
-    
+
     setViewMode('code');
-    
+
     try {
       let systemPrompt = `You are FNB AI PRO, an expert coding assistant and mentor. 
       Current language: ${language === 'en' ? 'English' : 'Khmer'}. 
@@ -227,10 +227,10 @@ You are an expert assistant. You can handle both general knowledge questions and
 `;
       } else if (feature === 'generate') {
         systemPrompt += `
-Task: You are an expert UI/UX Engineer and Frontend Developer. Generate high-quality, professional, and modern UI components or full page layouts based on the user's description.
+Task: You are an expert UI/UX Engineer and Frontend Developer. Generate high-quality, professional, and modern UI components.
 
 Guidelines:
-1. **Framework & Language Agnostic**: Default to **React (JSX/TSX)** with **Tailwind CSS** if no framework is specified. HOWEVER, you MUST strictly follow the user's requested language or framework (e.g., plain HTML/CSS/JS, Vue, Svelte, Angular, Python, Flutter, etc.) if they mention one.
+1. **Framework & Language Agnostic**: Default to html css and js. HOWEVER, you MUST strictly follow the user's requested language or framework (e.g., plain HTML/CSS/JS, Vue, Svelte, Angular, Python, Flutter, etc.) if they mention one.
 2. **Code Blocks**: ALWAYS wrap your code in appropriate markdown code blocks with the correct language identifier (e.g., \`\`\`jsx, \`\`\`html, \`\`\`css, \`\`\`vue).
 3. **Self-Contained Code**: Whenever possible, provide a complete, self-contained implementation in ONE code block so it can be easily copied and previewed. If multiple files (like index.html, style.css, script.js) are explicitly needed, separate them clearly into sequential code blocks.
 4. **Modern Design Aesthetics**: Apply elegant typography (Inter/system-ui), generous whitespace, refined shadows, and smooth transitions. Incorporate modern UI trends like glassmorphism, bento grids, or minimalist styling where appropriate.
@@ -272,7 +272,7 @@ Guidelines:
       // Prepare contents with history if continuing
       const currentMessage = { role: 'user' as const, parts: [{ text: currentInput }] };
       const contents = isContinuing ? [...chatHistory, currentMessage] : [currentMessage];
-      
+
       const groqMessages = [
         { role: 'system', content: systemPrompt },
         ...contents.map(msg => ({
@@ -306,7 +306,7 @@ Guidelines:
 
           const chunk = decoder.decode(value, { stream: true });
           const lines = chunk.split('\n');
-          
+
           for (const line of lines) {
             if (line.startsWith('data: ')) {
               const dataStr = line.replace('data: ', '').trim();
@@ -375,8 +375,8 @@ Guidelines:
     let match;
     let hasReact = false;
     let hasVue = false;
-    
-    const blocks: {lang: string, code: string}[] = [];
+
+    const blocks: { lang: string, code: string }[] = [];
     while ((match = codeBlockRegex.exec(markdown)) !== null) {
       blocks.push({ lang: (match[1] || '').toLowerCase(), code: match[2] });
     }
@@ -401,12 +401,12 @@ Guidelines:
 
     blocks.forEach(block => {
       let { lang, code } = block;
-      
+
       // Detect React content
       const isReact = lang === 'jsx' || lang === 'tsx' || code.includes('import React') || code.includes('useState') || code.includes('useEffect');
       // Detect Vue content
       const isVue = lang === 'vue' || code.includes('Vue.createApp') || code.includes('<template>') || code.includes('export default {');
-      
+
       if (isReact) {
         hasReact = true;
         // Clean up React code for browser-side Babel
@@ -429,7 +429,7 @@ Guidelines:
           const templateMatch = /<template>([\s\S]*?)<\/template>/.exec(code);
           const scriptMatch = /<script.*?>([\s\S]*?)<\/script>/.exec(code);
           const styleMatch = /<style.*?>([\s\S]*?)<\/style>/.exec(code);
-          
+
           if (templateMatch) html += `\n<div id="app-template" style="display:none;">${templateMatch[1]}</div>\n`;
           if (scriptMatch) {
             let sCode = scriptMatch[1].replace(/export\s+default\s+/, 'const vueOptions = ');
@@ -460,10 +460,10 @@ Guidelines:
     if (hasReact) {
       const componentNames = [...scripts.matchAll(/(?:function|class|const)\s+([A-Z]\w*)/g)].map(m => m[1]);
       const mainComponent = componentNames.find(name => name === 'App') || componentNames[0] || 'App';
-      
+
       scripts = scripts.replace(/ReactDOM\.render[\s\S]*?;/g, '');
       scripts = scripts.replace(/ReactDOM\.createRoot[\s\S]*?\.render[\s\S]*?;/g, '');
-      
+
       scripts += `\n
         try {
           const rootElement = document.getElementById('root');
@@ -497,7 +497,7 @@ Guidelines:
     } else {
       combinedContent = `<style>${styles}</style>${html}<script>${scripts}<\/script>`;
     }
-    
+
     return { code: combinedContent, hasReact, hasVue };
   };
 
@@ -617,30 +617,29 @@ Guidelines:
     <div className={`h-screen flex overflow-hidden font-sans transition-colors duration-300 ${theme} ${theme === 'dark' ? 'bg-brand-bg text-slate-200' : 'bg-slate-50 text-slate-900'}`}>
       <AnimatePresence mode="wait">
         {showSplash && (
-          <SplashScreen 
-            key="splash" 
-            theme={theme} 
-            onComplete={() => setShowSplash(false)} 
+          <SplashScreen
+            key="splash"
+            theme={theme}
+            onComplete={() => setShowSplash(false)}
           />
         )}
       </AnimatePresence>
 
       <InteractiveBackground theme={theme as 'light' | 'dark'} />
       <CurlyCursor />
-      
+
       {/* Mobile Overlay */}
       {isSidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <aside 
-        className={`fixed inset-y-0 left-0 z-50 w-64 glass-panel transition-transform duration-300 transform lg:relative lg:translate-x-0 ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } ${theme === 'dark' ? 'border-slate-800/50' : 'border-slate-200/60'}`}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-64 glass-panel transition-transform duration-300 transform lg:relative lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          } ${theme === 'dark' ? 'border-slate-800/50' : 'border-slate-200/60'}`}
       >
         <div className="flex flex-col h-full">
           {/* Sidebar Header */}
@@ -657,14 +656,14 @@ Guidelines:
           {/* Sidebar Navigation */}
           <div className="flex-1 overflow-y-auto py-6 px-4 flex flex-col gap-2 custom-scrollbar">
             <button
-              onClick={() => { 
-                setInput(''); 
-                setOutput(''); 
+              onClick={() => {
+                setInput('');
+                setOutput('');
                 setChatHistory([]);
                 setMessages([]);
                 setIsContinuing(false);
-                setActiveTab('home'); 
-                setIsSidebarOpen(false); 
+                setActiveTab('home');
+                setIsSidebarOpen(false);
               }}
               className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-brand-accent text-white font-bold text-xs uppercase tracking-widest hover:bg-brand-accent-hover transition-all shadow-[0_0_20px_rgba(99,102,241,0.2)] mb-4"
             >
@@ -672,7 +671,7 @@ Guidelines:
               {t.newChat}
             </button>
 
-            <motion.div 
+            <motion.div
               variants={{
                 hidden: { opacity: 0 },
                 show: {
@@ -704,7 +703,7 @@ Guidelines:
                     icon={tab.icon}
                     title={tab.label}
                     isActive={activeTab === tab.id}
-                    onClick={() => { 
+                    onClick={() => {
                       if (activeTab !== tab.id) {
                         setInput('');
                         setOutput('');
@@ -712,8 +711,8 @@ Guidelines:
                         setMessages([]);
                         setIsContinuing(false);
                       }
-                      setActiveTab(tab.id as Tab); 
-                      setIsSidebarOpen(false); 
+                      setActiveTab(tab.id as Tab);
+                      setIsSidebarOpen(false);
                     }}
                   />
                 </motion.div>
@@ -729,7 +728,7 @@ Guidelines:
                   recentChats
                     .filter(c => c.tab === (activeTab === 'home' ? 'chat' : activeTab))
                     .map((chat, idx) => (
-                      <button 
+                      <button
                         key={idx}
                         onClick={() => {
                           setInput(chat.input);
@@ -755,7 +754,7 @@ Guidelines:
         {/* Top Header */}
         <header className={`h-20 flex items-center justify-between px-8 z-20 ${theme === 'dark' ? 'bg-transparent' : 'bg-transparent'}`}>
           <div className="flex items-center gap-4">
-            <button 
+            <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               className={`p-2 rounded-lg transition-colors lg:hidden ${theme === 'dark' ? 'hover:bg-slate-800 text-slate-400' : 'hover:bg-slate-100 text-slate-500'}`}
             >
@@ -767,9 +766,8 @@ Guidelines:
             <LanguageToggle current={language} onToggle={setLanguage} />
             <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className={`flex items-center gap-2 transition-all ${
-                theme === 'dark' ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'
-              }`}
+              className={`flex items-center gap-2 transition-all ${theme === 'dark' ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'
+                }`}
             >
               <div className="w-10 h-10 flex items-center justify-center rounded-full border border-transparent hover:border-slate-800 transition-all">
                 {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
@@ -779,106 +777,104 @@ Guidelines:
         </header>
 
         <main className="flex-1 overflow-y-auto custom-scrollbar">
-        <AnimatePresence mode="wait">
-          {activeTab === 'home' ? (
-            <motion.div
-              key="home"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="max-w-6xl mx-auto px-6 py-12 flex flex-col gap-12"
-            >
-              {/* Hero Section */}
-              <motion.section 
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className="text-center flex flex-col items-center gap-2"
+          <AnimatePresence mode="wait">
+            {activeTab === 'home' ? (
+              <motion.div
+                key="home"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="max-w-6xl mx-auto px-6 py-12 flex flex-col gap-12"
               >
-                <h2 className={`text-4xl md:text-6xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-                  Welcome to {t.title} 👋!
-                </h2>
-                <p className={`text-xl md:text-2xl font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
-                  {t.subtitle}
-                </p>
-              </motion.section>
+                {/* Hero Section */}
+                <motion.section
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
+                  className="text-center flex flex-col items-center gap-2"
+                >
+                  <h2 className={`text-4xl md:text-6xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
+                    Welcome to {t.title} 👋!
+                  </h2>
+                  <p className={`text-xl md:text-2xl font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
+                    {t.subtitle}
+                  </p>
+                </motion.section>
 
-              {/* Central Search Bar */}
-              <motion.section 
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                className="w-full max-w-5xl mx-auto"
-              >
-                <div className={`relative group border-2 rounded-[40px] transition-all p-2 ${
-                  theme === 'dark' ? 'bg-slate-900/40 border-slate-800 focus-within:border-brand-accent/50' : 'bg-white border-slate-200 focus-within:border-brand-accent/50 shadow-sm'
-                }`}>
-                  <div className="flex items-center px-6 py-2">
-                    <input
-                      type="text"
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      onKeyDown={handleKeyDown}
-                      placeholder={t.inputPlaceholder}
-                      className={`flex-1 bg-transparent border-none focus:outline-none text-lg md:text-xl py-4 ${
-                        theme === 'dark' ? 'text-slate-200 placeholder:text-slate-600' : 'text-slate-800 placeholder:text-slate-400'
-                      }`}
-                    />
-                    <button
-                      onClick={handleAIAction}
-                      disabled={isLoading || !input.trim()}
-                      className="flex items-center gap-2 px-6 py-3 rounded-full bg-brand-accent text-white font-bold transition-all hover:bg-brand-accent-hover active:scale-95 disabled:opacity-50"
-                    >
-                      <div className="w-5 h-5 flex items-center justify-center">
-                         {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Play size={18} className="fill-current" />}
-                      </div>
-                      <span className="text-base font-medium">{t.start}</span>
-                    </button>
+                {/* Central Search Bar */}
+                <motion.section
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  className="w-full max-w-5xl mx-auto"
+                >
+                  <div className={`relative group border-2 rounded-[40px] transition-all p-2 ${theme === 'dark' ? 'bg-slate-900/40 border-slate-800 focus-within:border-brand-accent/50' : 'bg-white border-slate-200 focus-within:border-brand-accent/50 shadow-sm'
+                    }`}>
+                    <div className="flex items-center px-6 py-2">
+                      <input
+                        type="text"
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        placeholder={t.inputPlaceholder}
+                        className={`flex-1 bg-transparent border-none focus:outline-none text-lg md:text-xl py-4 ${theme === 'dark' ? 'text-slate-200 placeholder:text-slate-600' : 'text-slate-800 placeholder:text-slate-400'
+                          }`}
+                      />
+                      <button
+                        onClick={handleAIAction}
+                        disabled={isLoading || !input.trim()}
+                        className="flex items-center gap-2 px-6 py-3 rounded-full bg-brand-accent text-white font-bold transition-all hover:bg-brand-accent-hover active:scale-95 disabled:opacity-50"
+                      >
+                        <div className="w-5 h-5 flex items-center justify-center">
+                          {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Play size={18} className="fill-current" />}
+                        </div>
+                        <span className="text-base font-medium">{t.start}</span>
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </motion.section>
+                </motion.section>
 
-              {/* Output for Home Chat */}
-              <div className="max-w-4xl mx-auto w-full">
-                <AnimatePresence>
-                  {isLoading && (
+                {/* Output for Home Chat */}
+                <div className="max-w-4xl mx-auto w-full">
+                  <AnimatePresence>
+                    {isLoading && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className={`mt-6 border-2 rounded-2xl p-6 shadow-xl flex items-center gap-4 ${theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}
+                      >
+                        <div className="flex gap-1">
+                          {[0, 1, 2].map((i) => (
+                            <motion.div
+                              key={i}
+                              animate={{ y: [0, -5, 0] }}
+                              transition={{ repeat: Infinity, duration: 0.6, delay: i * 0.1 }}
+                              className="w-2 h-2 rounded-full bg-brand-accent"
+                            />
+                          ))}
+                        </div>
+                        <span className={`text-xs font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>AI is thinking...</span>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {messages.length > 0 && (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className={`mt-6 border-2 rounded-2xl p-6 shadow-xl flex items-center gap-4 ${theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}
+                      className={`mt-6 border-2 rounded-2xl p-6 shadow-xl ${theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}
                     >
-                      <div className="flex gap-1">
-                        {[0, 1, 2].map((i) => (
-                          <motion.div
-                            key={i}
-                            animate={{ y: [0, -5, 0] }}
-                            transition={{ repeat: Infinity, duration: 0.6, delay: i * 0.1 }}
-                            className="w-2 h-2 rounded-full bg-brand-accent"
-                          />
-                        ))}
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-2 text-brand-accent">
+                          <Sparkles size={14} />
+                          <span className="text-[10px] font-bold uppercase tracking-widest">Conversation</span>
+                        </div>
                       </div>
-                      <span className={`text-xs font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>AI is thinking...</span>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                {messages.length > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className={`mt-6 border-2 rounded-2xl p-6 shadow-xl ${theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}
-                  >
-                    <div className="flex items-center justify-between mb-6">
-                      <div className="flex items-center gap-2 text-brand-accent">
-                        <Sparkles size={14} />
-                        <span className="text-[10px] font-bold uppercase tracking-widest">Conversation</span>
-                      </div>
-                    </div>
-                    <div className="flex-1 overflow-y-auto custom-scrollbar">
-                      <div className="flex flex-col gap-8">
-                        {messages.map((msg, idx) => (
+                      <div className="flex-1 overflow-y-auto custom-scrollbar">
+                        <div className="flex flex-col gap-8">
+                          {messages.map((msg, idx) => (
                             <div key={msg.id} className={`flex flex-col gap-3 ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
                               {msg.role === 'user' ? (
                                 <div className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm font-medium shadow-sm ${theme === 'dark' ? 'bg-slate-800 text-slate-100 border border-slate-700' : 'bg-slate-100 text-slate-800 border border-slate-200'}`}>
@@ -924,7 +920,7 @@ Guidelines:
                           <div ref={messagesEndRef} />
 
                           {!isLoading && messages.length > 0 && (
-                            <motion.div 
+                            <motion.div
                               initial={{ opacity: 0, y: 10 }}
                               animate={{ opacity: 1, y: 0 }}
                               className="mt-4 pt-8 border-t border-slate-800/50"
@@ -948,146 +944,146 @@ Guidelines:
                       </div>
                     </motion.div>
                   )}
-              </div>
+                </div>
 
-              {/* Feature Grid */}
-              <motion.section 
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto w-full px-4"
-              >
-                {[
-                  { 
-                    id: 'generate', 
-                    label: t.codeGenerator, 
-                    icon: Code2, 
-                    bgColor: 'bg-blue-600',
-                    description: "Translates natural language prompts into functional code in multiple programming language, and more. Includes inline comments and explanations."
-                  },
-                  { 
-                    id: 'debug', 
-                    label: t.smartDebugging, 
-                    icon: Bug, 
-                    bgColor: 'bg-pink-600',
-                    description: "Identify and fix errors with AI assistance"
-                  },
-                  { 
-                    id: 'explain', 
-                    label: t.codeExplanation, 
-                    icon: BookOpen, 
-                    bgColor: 'bg-purple-600',
-                    description: "Understand complex code step-by-step"
-                  },
-                  { 
-                    id: 'test', 
-                    label: t.testGeneration, 
-                    icon: TestTube2, 
-                    bgColor: 'bg-emerald-500', 
-                    description: "Automatically create comprehensive test cases"
-                  },
-                ].map((feature) => (
-                  <FeatureGridCard
-                    key={feature.id}
-                    icon={feature.icon}
-                    title={feature.label}
-                    description={feature.description}
-                    iconBgColor={feature.bgColor}
-                    tryItNowLabel={t.tryItNow}
-                    onClick={() => { 
-                      setInput(''); 
-                      setOutput(''); 
-                      setChatHistory([]); 
-                      setIsContinuing(false); 
-                      setActiveTab(feature.id as Tab); 
-                    }}
-                  />
-                ))}
-              </motion.section>
-
-              {/* Info Sections */}
-              <motion.section 
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-                className="grid grid-cols-1 md:grid-cols-2 gap-0 border-2 rounded-[32px] overflow-hidden max-w-5xl mx-auto w-full border-slate-800"
-              >
-                <div className={`p-10 transition-colors ${theme === 'dark' ? 'bg-[#0a0c14] border-r border-slate-800' : 'bg-slate-900 border-r border-slate-700'} flex flex-col gap-6`}>
-                  <h4 className="text-blue-500 text-sm font-bold uppercase tracking-widest">{t.forStudents}</h4>
-                  <ul className="flex flex-col gap-5">
-                    {[
-                      "Debug and fix code errors efficiently",
-                      "Understand complex algorithms step-by-step",
-                      "Learn best practices and optimization",
-                      "Get instant coding assistance 24/7"
-                    ].map((item, i) => (
-                      <li key={i} className="flex items-center gap-4 text-sm text-slate-400 group">
-                        <div className="w-5 h-5 rounded-full border border-blue-500/30 flex items-center justify-center bg-blue-500/10 group-hover:bg-blue-500 group-hover:text-white transition-all">
-                          <CheckCircle2 size={12} className="text-blue-400 group-hover:text-white" />
-                        </div>
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className={`p-10 transition-colors ${theme === 'dark' ? 'bg-[#0a0c14]' : 'bg-slate-900'} flex flex-col gap-6`}>
-                  <h4 className="text-blue-500 text-sm font-bold uppercase tracking-widest">{t.forEducators}</h4>
-                  <ul className="flex flex-col gap-5">
-                    {[
-                      "Generate comprehensive documentation",
-                      "Create test cases for assignments",
-                      "Provide code examples and explanations",
-                      "Save time on content creation"
-                    ].map((item, i) => (
-                      <li key={i} className="flex items-center gap-4 text-sm text-slate-400 group">
-                        <div className="w-5 h-5 rounded-full border border-blue-500/30 flex items-center justify-center bg-blue-500/10 group-hover:bg-blue-500 group-hover:text-white transition-all">
-                          <CheckCircle2 size={12} className="text-blue-400 group-hover:text-white" />
-                        </div>
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </motion.section>
-            </motion.div>
-          ) : (
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="max-w-7xl mx-auto px-4 py-8 flex flex-col gap-6 lg:h-full"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className={`text-2xl font-bold uppercase tracking-tight ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-                    {activeTab === 'generate' ? t.codeGenerator : 
-                     activeTab === 'debug' ? t.smartDebugging : 
-                     activeTab === 'explain' ? t.codeExplanation : 
-                     activeTab === 'test' ? t.testGeneration : 
-                     activeTab === 'chat' ? t.askAiAnything : t.codeGenerator}
-                  </h2>
-                  <p className={`text-sm ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>
-                    {activeTab === 'generate' ? "Generate high-quality code from descriptions" : 
-                     activeTab === 'debug' ? "Find and fix bugs in your code" : 
-                     activeTab === 'explain' ? "Get a detailed breakdown of your code" : 
-                     activeTab === 'test' ? "Create unit tests for your functions" : 
-                     activeTab === 'chat' ? "Get instant answers to your coding questions" : "Transform natural language into functional code"}
-                  </p>
-                </div>
-                <button 
-                  onClick={() => setActiveTab('home')}
-                  className={`text-xs font-bold uppercase tracking-widest transition-colors ${theme === 'dark' ? 'text-slate-500 hover:text-white' : 'text-slate-400 hover:text-slate-900'}`}
+                {/* Feature Grid */}
+                <motion.section
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto w-full px-4"
                 >
-                  {t.backToHome}
-                </button>
-              </div>
+                  {[
+                    {
+                      id: 'generate',
+                      label: t.codeGenerator,
+                      icon: Code2,
+                      bgColor: 'bg-blue-600',
+                      description: "Translates natural language prompts into functional code in multiple programming language, and more. Includes inline comments and explanations."
+                    },
+                    {
+                      id: 'debug',
+                      label: t.smartDebugging,
+                      icon: Bug,
+                      bgColor: 'bg-pink-600',
+                      description: "Identify and fix errors with AI assistance"
+                    },
+                    {
+                      id: 'explain',
+                      label: t.codeExplanation,
+                      icon: BookOpen,
+                      bgColor: 'bg-purple-600',
+                      description: "Understand complex code step-by-step"
+                    },
+                    {
+                      id: 'test',
+                      label: t.testGeneration,
+                      icon: TestTube2,
+                      bgColor: 'bg-emerald-500',
+                      description: "Automatically create comprehensive test cases"
+                    },
+                  ].map((feature) => (
+                    <FeatureGridCard
+                      key={feature.id}
+                      icon={feature.icon}
+                      title={feature.label}
+                      description={feature.description}
+                      iconBgColor={feature.bgColor}
+                      tryItNowLabel={t.tryItNow}
+                      onClick={() => {
+                        setInput('');
+                        setOutput('');
+                        setChatHistory([]);
+                        setIsContinuing(false);
+                        setActiveTab(feature.id as Tab);
+                      }}
+                    />
+                  ))}
+                </motion.section>
 
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:flex-1 lg:min-h-0">
-                {/* Input Area */}
-                <div className="lg:col-span-5 flex flex-col gap-6">
-                  <div className="flex-1 flex flex-col gap-4">
+                {/* Info Sections */}
+                <motion.section
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8 }}
+                  className="grid grid-cols-1 md:grid-cols-2 gap-0 border-2 rounded-[32px] overflow-hidden max-w-5xl mx-auto w-full border-slate-800"
+                >
+                  <div className={`p-10 transition-colors ${theme === 'dark' ? 'bg-[#0a0c14] border-r border-slate-800' : 'bg-slate-900 border-r border-slate-700'} flex flex-col gap-6`}>
+                    <h4 className="text-blue-500 text-sm font-bold uppercase tracking-widest">{t.forStudents}</h4>
+                    <ul className="flex flex-col gap-5">
+                      {[
+                        t.studentFeature1,
+                        t.studentFeature2,
+                        t.studentFeature3,
+                        t.studentFeature4
+                      ].map((item, i) => (
+                        <li key={i} className="flex items-center gap-4 text-sm text-slate-400 group">
+                          <div className="w-5 h-5 rounded-full border border-blue-500/30 flex items-center justify-center bg-blue-500/10 group-hover:bg-blue-500 group-hover:text-white transition-all">
+                            <CheckCircle2 size={12} className="text-blue-400 group-hover:text-white" />
+                          </div>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className={`p-10 transition-colors ${theme === 'dark' ? 'bg-[#0a0c14]' : 'bg-slate-900'} flex flex-col gap-6`}>
+                    <h4 className="text-blue-500 text-sm font-bold uppercase tracking-widest">{t.forEducators}</h4>
+                    <ul className="flex flex-col gap-5">
+                      {[
+                        t.educatorFeature1,
+                        t.educatorFeature2,
+                        t.educatorFeature3,
+                        t.educatorFeature4
+                      ].map((item, i) => (
+                        <li key={i} className="flex items-center gap-4 text-sm text-slate-400 group">
+                          <div className="w-5 h-5 rounded-full border border-blue-500/30 flex items-center justify-center bg-blue-500/10 group-hover:bg-blue-500 group-hover:text-white transition-all">
+                            <CheckCircle2 size={12} className="text-blue-400 group-hover:text-white" />
+                          </div>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </motion.section>
+              </motion.div>
+            ) : (
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="max-w-7xl mx-auto px-4 py-8 flex flex-col gap-6 lg:h-full"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className={`text-2xl font-bold uppercase tracking-tight ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
+                      {activeTab === 'generate' ? t.codeGenerator :
+                        activeTab === 'debug' ? t.smartDebugging :
+                          activeTab === 'explain' ? t.codeExplanation :
+                            activeTab === 'test' ? t.testGeneration :
+                              activeTab === 'chat' ? t.askAiAnything : t.codeGenerator}
+                    </h2>
+                    <p className={`text-sm ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>
+                      {activeTab === 'generate' ? "Generate high-quality code from descriptions" :
+                        activeTab === 'debug' ? "Find and fix bugs in your code" :
+                          activeTab === 'explain' ? "Get a detailed breakdown of your code" :
+                            activeTab === 'test' ? "Create unit tests for your functions" :
+                              activeTab === 'chat' ? "Get instant answers to your coding questions" : "Transform natural language into functional code"}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setActiveTab('home')}
+                    className={`text-xs font-bold uppercase tracking-widest transition-colors ${theme === 'dark' ? 'text-slate-500 hover:text-white' : 'text-slate-400 hover:text-slate-900'}`}
+                  >
+                    {t.backToHome}
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:flex-1 lg:min-h-0">
+                  {/* Input Area */}
+                  <div className="lg:col-span-5 flex flex-col gap-6">
+                    <div className="flex-1 flex flex-col gap-4">
                       <div className="flex-1 relative min-h-[400px]">
                         <textarea
                           ref={inputRef}
@@ -1097,7 +1093,7 @@ Guidelines:
                           placeholder={t.inputPlaceholder}
                           className={`w-full h-full border rounded-2xl p-6 text-sm font-mono focus:outline-none focus:border-brand-accent/50 transition-all resize-none ${theme === 'dark' ? 'bg-brand-card border-slate-800 text-slate-200' : 'bg-white border-slate-200 text-slate-800 shadow-sm'}`}
                         />
-                         <div className="absolute bottom-4 right-4 flex items-center gap-2">
+                        <div className="absolute bottom-4 right-4 flex items-center gap-2">
                           {input && <CopyButton text={input} className={`${theme === 'dark' ? 'bg-slate-800 text-slate-400 hover:text-white' : 'bg-slate-100 text-slate-500 hover:text-slate-900'}`} />}
                           <button
                             onClick={() => setInput('')}
@@ -1105,193 +1101,191 @@ Guidelines:
                           >
                             <Trash2 size={18} />
                           </button>
-                        <button
-                          onClick={handleAIAction}
-                          disabled={isLoading || !input.trim()}
-                          className="flex items-center gap-2 px-6 py-2 rounded-lg bg-brand-accent text-white text-xs font-bold uppercase tracking-widest hover:bg-brand-accent-hover transition-all disabled:opacity-50"
-                        >
-                          {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-                          {activeTab === 'generate' ? t.generate : 
-                           activeTab === 'debug' ? t.debug : 
-                           activeTab === 'explain' ? t.explain : 
-                           activeTab === 'test' ? t.test : 
-                           activeTab === 'chat' ? t.getAnswer : t.generate}
-                        </button>
+                          <button
+                            onClick={handleAIAction}
+                            disabled={isLoading || !input.trim()}
+                            className="flex items-center gap-2 px-6 py-2 rounded-lg bg-brand-accent text-white text-xs font-bold uppercase tracking-widest hover:bg-brand-accent-hover transition-all disabled:opacity-50"
+                          >
+                            {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                            {activeTab === 'generate' ? t.generate :
+                              activeTab === 'debug' ? t.debug :
+                                activeTab === 'explain' ? t.explain :
+                                  activeTab === 'test' ? t.test :
+                                    activeTab === 'chat' ? t.getAnswer : t.generate}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Output Area */}
-                <div className={`lg:col-span-7 flex flex-col border rounded-2xl overflow-hidden ${theme === 'dark' ? 'bg-brand-card border-slate-800' : 'bg-white border-slate-200 shadow-sm'}`}>
-                  <div className={`px-6 py-3 border-b flex items-center justify-between ${theme === 'dark' ? 'bg-slate-900/50 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
-                    <div className="flex items-center gap-2 text-brand-accent">
-                      <Sparkles size={14} />
-                      <span className="text-[10px] font-bold uppercase tracking-widest">AI Response</span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      {output && showPreviewOption && (
-                        <div className={`flex items-center rounded-lg p-1 border ${theme === 'dark' ? 'bg-slate-950 border-slate-800' : 'bg-white border-slate-200'}`}>
-                          <button
-                            onClick={() => setViewMode('code')}
-                            className={`px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${
-                              viewMode === 'code' ? (theme === 'dark' ? 'bg-slate-800 text-brand-accent' : 'bg-slate-100 text-brand-accent') : 'text-slate-500 hover:text-slate-300'
-                            }`}
-                          >
-                            {t.code}
-                          </button>
-                          <button
-                            onClick={() => setViewMode('preview')}
-                            className={`px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${
-                              viewMode === 'preview' ? (theme === 'dark' ? 'bg-slate-800 text-brand-accent' : 'bg-slate-100 text-brand-accent') : 'text-slate-500 hover:text-slate-300'
-                            }`}
-                          >
-                            {t.preview}
-                          </button>
-                        </div>
-                      )}
-                      {viewMode === 'preview' && output && showPreviewOption && (
-                        <button 
-                          onClick={() => {
-                            const iframe = document.querySelector('iframe');
-                            if (iframe) (iframe as any).srcDoc = getPreviewContent();
-                          }}
-                          className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-slate-800 text-slate-400' : 'hover:bg-slate-100 text-slate-500'}`}
-                          title="Refresh Preview"
-                        >
-                          <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex-1 p-6 overflow-y-auto custom-scrollbar" ref={outputRef}>
-                    {messages.length > 0 ? (
-                      viewMode === 'preview' && showPreviewOption ? (
-                        <div className="h-full flex flex-col gap-4">
-                          <div className="flex items-center justify-between px-2">
-                            <div className="flex items-center gap-2">
-                              <div className={`w-2 h-2 rounded-full ${isLoading ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`} />
-                              <span className={`text-[10px] font-bold uppercase tracking-widest ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>
-                                {isLoading ? 'Live Syncing...' : 'Preview Ready'}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <button 
-                                onClick={() => setPreviewDevice('desktop')}
-                                className={`p-1.5 rounded transition-colors ${previewDevice === 'desktop' ? 'bg-brand-accent/20 text-brand-accent' : 'text-slate-500 hover:text-slate-300'}`}
-                              >
-                                <Monitor size={14} />
-                              </button>
-                              <button 
-                                onClick={() => setPreviewDevice('mobile')}
-                                className={`p-1.5 rounded transition-colors ${previewDevice === 'mobile' ? 'bg-brand-accent/20 text-brand-accent' : 'text-slate-500 hover:text-slate-300'}`}
-                              >
-                                <Smartphone size={14} />
-                              </button>
-                            </div>
-                          </div>
-                          <div className={`flex-1 relative rounded-xl overflow-hidden border ${theme === 'dark' ? 'border-slate-800' : 'border-slate-200'} transition-all duration-300 ${previewDevice === 'mobile' ? 'max-w-[375px] mx-auto shadow-2xl' : 'w-full'}`}>
-                            <iframe
-                              srcDoc={getPreviewContent()}
-                              className={`w-full h-full min-h-[400px] border-none ${theme === 'dark' ? 'bg-slate-950' : 'bg-white'}`}
-                              title="Live Preview"
-                            />
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex flex-col gap-8">
-                          {messages.map((msg, idx) => (
-                            <div key={msg.id} className={`flex flex-col gap-3 ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
-                              {msg.role === 'user' ? (
-                                <div className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm font-medium shadow-sm relative group ${theme === 'dark' ? 'bg-slate-800 text-slate-100 border border-slate-700' : 'bg-slate-100 text-slate-800 border border-slate-200'}`}>
-                                  <div className="flex items-center justify-between gap-4 mb-1">
-                                    <div className="flex items-center gap-2 opacity-50">
-                                      <User size={12} />
-                                      <span className="text-[10px] uppercase tracking-widest font-bold">You</span>
-                                    </div>
-                                    <CopyButton 
-                                      text={msg.content} 
-                                      className="opacity-0 group-hover:opacity-100 transition-opacity p-1" 
-                                    />
-                                  </div>
-                                  {msg.content}
-                                </div>
-                              ) : (
-                                <div className="w-full">
-                                  <div className="flex items-center justify-between gap-4 mb-4 group/header">
-                                    <div className="flex items-center gap-2 opacity-50">
-                                      <div className="p-1 rounded bg-brand-accent/20 text-brand-accent">
-                                        <Cpu size={12} />
-                                      </div>
-                                      <span className="text-[10px] uppercase tracking-widest font-bold">FNB AI PRO</span>
-                                    </div>
-                                    <CopyButton 
-                                      text={msg.content} 
-                                      className="p-1 text-slate-500 hover:text-brand-accent" 
-                                    />
-                                  </div>
-                                  <div className="markdown-body">
-                                    <ReactMarkdown
-                                      components={{
-                                        code({ node, inline, className, children, ...props }: any) {
-                                          const match = /language-(\w+)/.exec(className || '');
-                                          return !inline && match ? (
-                                            <CodeBlock
-                                              code={String(children).replace(/\n$/, '')}
-                                              language={match[1]}
-                                            />
-                                          ) : (
-                                            <code className={className} {...props}>
-                                              {children}
-                                            </code>
-                                          );
-                                        }
-                                      }}
-                                    >
-                                      {msg.content}
-                                    </ReactMarkdown>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                          <div ref={messagesEndRef} />
-
-                          {!isLoading && messages.length > 0 && (
-                            <motion.div 
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              className="mt-4 pt-8 border-t border-slate-800/50"
+                  {/* Output Area */}
+                  <div className={`lg:col-span-7 flex flex-col border rounded-2xl overflow-hidden ${theme === 'dark' ? 'bg-brand-card border-slate-800' : 'bg-white border-slate-200 shadow-sm'}`}>
+                    <div className={`px-6 py-3 border-b flex items-center justify-between ${theme === 'dark' ? 'bg-slate-900/50 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
+                      <div className="flex items-center gap-2 text-brand-accent">
+                        <Sparkles size={14} />
+                        <span className="text-[10px] font-bold uppercase tracking-widest">AI Response</span>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        {output && showPreviewOption && (
+                          <div className={`flex items-center rounded-lg p-1 border ${theme === 'dark' ? 'bg-slate-950 border-slate-800' : 'bg-white border-slate-200'}`}>
+                            <button
+                              onClick={() => setViewMode('code')}
+                              className={`px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${viewMode === 'code' ? (theme === 'dark' ? 'bg-slate-800 text-brand-accent' : 'bg-slate-100 text-brand-accent') : 'text-slate-500 hover:text-slate-300'
+                                }`}
                             >
-                              <button
-                                onClick={() => {
-                                  setIsContinuing(true);
-                                  inputRef.current?.focus();
-                                  inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                }}
-                                className="flex items-center gap-2 text-brand-accent hover:text-brand-accent-hover transition-colors group"
-                              >
-                                <div className="p-2 rounded-full bg-brand-accent/10 group-hover:bg-brand-accent/20 transition-colors">
-                                  <Plus size={16} />
-                                </div>
-                                <span className="text-xs font-bold uppercase tracking-widest">{t.continueToAsk}</span>
-                              </button>
-                            </motion.div>
-                          )}
-                        </div>
-                      )
-                    ) : (
-                      <div className={`h-full flex flex-col items-center justify-center gap-4 ${theme === 'dark' ? 'text-slate-600' : 'text-slate-300'}`}>
-                        <Cpu size={48} className="opacity-20" />
-                        <p className="text-xs font-bold uppercase tracking-widest">Awaiting Input</p>
+                              {t.code}
+                            </button>
+                            <button
+                              onClick={() => setViewMode('preview')}
+                              className={`px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${viewMode === 'preview' ? (theme === 'dark' ? 'bg-slate-800 text-brand-accent' : 'bg-slate-100 text-brand-accent') : 'text-slate-500 hover:text-slate-300'
+                                }`}
+                            >
+                              {t.preview}
+                            </button>
+                          </div>
+                        )}
+                        {viewMode === 'preview' && output && showPreviewOption && (
+                          <button
+                            onClick={() => {
+                              const iframe = document.querySelector('iframe');
+                              if (iframe) (iframe as any).srcDoc = getPreviewContent();
+                            }}
+                            className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-slate-800 text-slate-400' : 'hover:bg-slate-100 text-slate-500'}`}
+                            title="Refresh Preview"
+                          >
+                            <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} />
+                          </button>
+                        )}
                       </div>
-                    )}
+                    </div>
+                    <div className="flex-1 p-6 overflow-y-auto custom-scrollbar" ref={outputRef}>
+                      {messages.length > 0 ? (
+                        viewMode === 'preview' && showPreviewOption ? (
+                          <div className="h-full flex flex-col gap-4">
+                            <div className="flex items-center justify-between px-2">
+                              <div className="flex items-center gap-2">
+                                <div className={`w-2 h-2 rounded-full ${isLoading ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`} />
+                                <span className={`text-[10px] font-bold uppercase tracking-widest ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>
+                                  {isLoading ? 'Live Syncing...' : 'Preview Ready'}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => setPreviewDevice('desktop')}
+                                  className={`p-1.5 rounded transition-colors ${previewDevice === 'desktop' ? 'bg-brand-accent/20 text-brand-accent' : 'text-slate-500 hover:text-slate-300'}`}
+                                >
+                                  <Monitor size={14} />
+                                </button>
+                                <button
+                                  onClick={() => setPreviewDevice('mobile')}
+                                  className={`p-1.5 rounded transition-colors ${previewDevice === 'mobile' ? 'bg-brand-accent/20 text-brand-accent' : 'text-slate-500 hover:text-slate-300'}`}
+                                >
+                                  <Smartphone size={14} />
+                                </button>
+                              </div>
+                            </div>
+                            <div className={`flex-1 relative rounded-xl overflow-hidden border ${theme === 'dark' ? 'border-slate-800' : 'border-slate-200'} transition-all duration-300 ${previewDevice === 'mobile' ? 'max-w-[375px] mx-auto shadow-2xl' : 'w-full'}`}>
+                              <iframe
+                                srcDoc={getPreviewContent()}
+                                className={`w-full h-full min-h-[400px] border-none ${theme === 'dark' ? 'bg-slate-950' : 'bg-white'}`}
+                                title="Live Preview"
+                              />
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col gap-8">
+                            {messages.map((msg, idx) => (
+                              <div key={msg.id} className={`flex flex-col gap-3 ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+                                {msg.role === 'user' ? (
+                                  <div className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm font-medium shadow-sm relative group ${theme === 'dark' ? 'bg-slate-800 text-slate-100 border border-slate-700' : 'bg-slate-100 text-slate-800 border border-slate-200'}`}>
+                                    <div className="flex items-center justify-between gap-4 mb-1">
+                                      <div className="flex items-center gap-2 opacity-50">
+                                        <User size={12} />
+                                        <span className="text-[10px] uppercase tracking-widest font-bold">You</span>
+                                      </div>
+                                      <CopyButton
+                                        text={msg.content}
+                                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1"
+                                      />
+                                    </div>
+                                    {msg.content}
+                                  </div>
+                                ) : (
+                                  <div className="w-full">
+                                    <div className="flex items-center justify-between gap-4 mb-4 group/header">
+                                      <div className="flex items-center gap-2 opacity-50">
+                                        <div className="p-1 rounded bg-brand-accent/20 text-brand-accent">
+                                          <Cpu size={12} />
+                                        </div>
+                                        <span className="text-[10px] uppercase tracking-widest font-bold">FNB AI PRO</span>
+                                      </div>
+                                      <CopyButton
+                                        text={msg.content}
+                                        className="p-1 text-slate-500 hover:text-brand-accent"
+                                      />
+                                    </div>
+                                    <div className="markdown-body">
+                                      <ReactMarkdown
+                                        components={{
+                                          code({ node, inline, className, children, ...props }: any) {
+                                            const match = /language-(\w+)/.exec(className || '');
+                                            return !inline && match ? (
+                                              <CodeBlock
+                                                code={String(children).replace(/\n$/, '')}
+                                                language={match[1]}
+                                              />
+                                            ) : (
+                                              <code className={className} {...props}>
+                                                {children}
+                                              </code>
+                                            );
+                                          }
+                                        }}
+                                      >
+                                        {msg.content}
+                                      </ReactMarkdown>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                            <div ref={messagesEndRef} />
+
+                            {!isLoading && messages.length > 0 && (
+                              <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="mt-4 pt-8 border-t border-slate-800/50"
+                              >
+                                <button
+                                  onClick={() => {
+                                    setIsContinuing(true);
+                                    inputRef.current?.focus();
+                                    inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                  }}
+                                  className="flex items-center gap-2 text-brand-accent hover:text-brand-accent-hover transition-colors group"
+                                >
+                                  <div className="p-2 rounded-full bg-brand-accent/10 group-hover:bg-brand-accent/20 transition-colors">
+                                    <Plus size={16} />
+                                  </div>
+                                  <span className="text-xs font-bold uppercase tracking-widest">{t.continueToAsk}</span>
+                                </button>
+                              </motion.div>
+                            )}
+                          </div>
+                        )
+                      ) : (
+                        <div className={`h-full flex flex-col items-center justify-center gap-4 ${theme === 'dark' ? 'text-slate-600' : 'text-slate-300'}`}>
+                          <Cpu size={48} className="opacity-20" />
+                          <p className="text-xs font-bold uppercase tracking-widest">Awaiting Input</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </main>
 
         {/* Footer */}
