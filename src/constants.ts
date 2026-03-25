@@ -55,6 +55,8 @@ export interface Translation {
   educatorFeature2: string;
   educatorFeature3: string;
   educatorFeature4: string;
+  speak: string;
+  stop: string;
 }
 
 export const translations: Record<Language, Translation> = {
@@ -113,6 +115,8 @@ export const translations: Record<Language, Translation> = {
     educatorFeature2: "Create test cases for assignments",
     educatorFeature3: "Provide code examples and explanations",
     educatorFeature4: "Save time on content creation",
+    speak: "Speak",
+    stop: "Stop",
   },
   km: {
     title: "FNB",
@@ -169,5 +173,7 @@ export const translations: Record<Language, Translation> = {
     educatorFeature2: "បង្កើតតេស្តសាកល្បងសម្រាប់កិច្ចការ",
     educatorFeature3: "ផ្តល់ឧទាហរណ៍កូដ និងការពន្យល់",
     educatorFeature4: "សន្សំសំចៃពេលវេលាក្នុងការបង្កើតមាតិកា",
+    speak: "អាន",
+    stop: "បញ្ឈប់",
   }
 };

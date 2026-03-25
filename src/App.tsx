@@ -44,6 +44,7 @@ import InteractiveBackground from './components/InteractiveBackground';
 import SplashScreen from './components/SplashScreen';
 import CurlyCursor from './components/CurlyCursor';
 import CopyButton from './components/CopyButton';
+import TTSButton from './components/TTSButton';
 
 type Tab = 'home' | 'chat' | 'generate' | 'debug' | 'test' | 'explain';
 
@@ -1156,6 +1157,13 @@ Guidelines:
                             <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} />
                           </button>
                         )}
+                        {output && !isLoading && (
+                          <TTSButton
+                            text={output}
+                            language={language}
+                            className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-slate-800 text-slate-400' : 'hover:bg-slate-100 text-slate-500'}`}
+                          />
+                        )}
                       </div>
                     </div>
                     <div className="flex-1 p-6 overflow-y-auto custom-scrollbar" ref={outputRef}>
@@ -1219,10 +1227,17 @@ Guidelines:
                                         </div>
                                         <span className="text-[10px] uppercase tracking-widest font-bold">FNB AI PRO</span>
                                       </div>
-                                      <CopyButton
-                                        text={msg.content}
-                                        className="p-1 text-slate-500 hover:text-brand-accent"
-                                      />
+                                      <div className="flex items-center gap-1">
+                                        <TTSButton
+                                          text={msg.content}
+                                          language={language}
+                                          className="p-1 text-slate-500 hover:text-brand-accent transition-colors"
+                                        />
+                                        <CopyButton
+                                          text={msg.content}
+                                          className="p-1 text-slate-500 hover:text-brand-accent"
+                                        />
+                                      </div>
                                     </div>
                                     <div className="markdown-body">
                                       <ReactMarkdown
