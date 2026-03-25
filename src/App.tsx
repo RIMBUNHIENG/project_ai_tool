@@ -28,7 +28,8 @@ import {
   Plus,
   RefreshCw,
   Monitor,
-  Smartphone
+  Smartphone,
+  Play
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
@@ -752,29 +753,27 @@ Guidelines:
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10">
         {/* Top Header */}
-        <header className={`h-16 border-b flex items-center justify-between px-6 backdrop-blur-md ${theme === 'dark' ? 'bg-brand-bg/50 border-slate-800/50' : 'bg-white/80 border-slate-200/60'}`}>
+        <header className={`h-20 flex items-center justify-between px-8 z-20 ${theme === 'dark' ? 'bg-transparent' : 'bg-transparent'}`}>
           <div className="flex items-center gap-4">
             <button 
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               className={`p-2 rounded-lg transition-colors lg:hidden ${theme === 'dark' ? 'hover:bg-slate-800 text-slate-400' : 'hover:bg-slate-100 text-slate-500'}`}
             >
-              {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+              <Menu size={20} />
             </button>
-            <div className={`flex items-center gap-2 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>
-              <LayoutDashboard size={16} className="hidden sm:block" />
-              <span className="text-xs font-bold uppercase tracking-widest hidden sm:block">Dashboard</span>
-              <span className={`hidden sm:block ${theme === 'dark' ? 'text-slate-700' : 'text-slate-300'}`}>/</span>
-              <span className={`text-xs font-bold uppercase tracking-widest ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>{activeTab}</span>
-            </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-8">
             <LanguageToggle current={language} onToggle={setLanguage} />
             <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className={`p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-slate-800 text-slate-400 hover:text-white' : 'hover:bg-slate-100 text-slate-500 hover:text-slate-900'}`}
+              className={`flex items-center gap-2 transition-all ${
+                theme === 'dark' ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900'
+              }`}
             >
-              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+              <div className="w-10 h-10 flex items-center justify-center rounded-full border border-transparent hover:border-slate-800 transition-all">
+                {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+              </div>
             </button>
           </div>
         </header>
@@ -787,7 +786,7 @@ Guidelines:
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="max-w-7xl mx-auto px-4 py-12 flex flex-col gap-16"
+              className="max-w-6xl mx-auto px-6 py-12 flex flex-col gap-12"
             >
               {/* Hero Section */}
               <motion.section 
@@ -795,99 +794,60 @@ Guidelines:
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
-                className="text-center flex flex-col items-center gap-6 relative"
+                className="text-center flex flex-col items-center gap-2"
               >
-                <div className="absolute top-0 right-0 pointer-events-none opacity-50">
-                  <div className="flex flex-col gap-2">
-                    {[...Array(10)].map((_, i) => (
-                      <div key={i} className="flex gap-2">
-                        {[...Array(5)].map((_, j) => (
-                          <div key={j} className={`w-2 h-2 rounded-full ${Math.random() > 0.7 ? 'bg-brand-accent' : 'bg-slate-800'}`} />
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-accent/10 border border-brand-accent/20 text-brand-accent text-[10px] font-bold uppercase tracking-widest">
-                  <Sparkles size={12} />
-                  {t.poweredBy}
-                </div>
-                
-                <h2 className={`text-4xl sm:text-5xl md:text-6xl font-black tracking-tight uppercase ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-                  {t.title}
+                <h2 className={`text-4xl md:text-6xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
+                  Welcome to {t.title} 👋!
                 </h2>
-                <p className={`text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
+                <p className={`text-xl md:text-2xl font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
                   {t.subtitle}
                 </p>
-                
-                <button 
-                  onClick={() => {
-                    const chatSection = document.getElementById('home-chat-section');
-                    if (chatSection) {
-                      chatSection.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }}
-                  className="flex items-center gap-2 px-8 py-3 rounded-xl bg-brand-accent text-white font-bold uppercase tracking-widest hover:bg-brand-accent-hover transition-all shadow-[0_0_30px_rgba(139,92,246,0.3)]"
-                >
-                  {t.getStarted}
-                  <ArrowRight size={18} />
-                </button>
               </motion.section>
 
-              {/* Chat Interface (Ask AI Anything) */}
+              {/* Central Search Bar */}
               <motion.section 
-                id="home-chat-section"
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="max-w-4xl mx-auto w-full"
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                className="w-full max-w-5xl mx-auto"
               >
-                <div className={`border rounded-2xl overflow-hidden shadow-2xl transition-colors ${theme === 'dark' ? 'bg-brand-card border-slate-800' : 'bg-white border-slate-200'}`}>
-                  <div className={`p-6 border-b flex items-center gap-3 ${theme === 'dark' ? 'border-slate-800' : 'border-slate-100'}`}>
-                    <div className="w-8 h-8 rounded-lg bg-brand-accent/20 flex items-center justify-center text-brand-accent">
-                      <Sparkles size={18} />
-                    </div>
-                    <div>
-                      <h3 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>{t.askAiAnything}</h3>
-                      <p className={`text-xs ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>Get instant answers to your coding questions</p>
-                    </div>
-                  </div>
-                  
-                  <div className="p-6 flex flex-col gap-4">
-                    <div className="flex flex-col gap-2">
-                      <label className={`text-xs font-bold uppercase tracking-widest ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>{t.yourQuestion}</label>
-                      <textarea
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        placeholder={t.inputPlaceholder}
-                        className={`w-full h-32 border rounded-xl p-4 text-sm focus:outline-none focus:border-brand-accent/50 transition-all resize-none ${theme === 'dark' ? 'bg-slate-950/50 border-slate-800 text-slate-200' : 'bg-slate-50 border-slate-200 text-slate-800'}`}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <p className={`text-[10px] italic ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>Press Ctrl+Enter to submit</p>
-                      <button
-                        onClick={handleAIAction}
-                        disabled={isLoading || !input.trim()}
-                        className="flex items-center gap-2 px-6 py-2 rounded-lg bg-brand-accent/20 border border-brand-accent/30 text-brand-accent text-xs font-bold uppercase tracking-widest hover:bg-brand-accent hover:text-white transition-all disabled:opacity-50"
-                      >
-                        {isLoading ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
-                        {isLoading ? (language === 'en' ? 'Sending...' : 'កំពុងផ្ញើ...') : t.getAnswer}
-                      </button>
-                    </div>
+                <div className={`relative group border-2 rounded-[40px] transition-all p-2 ${
+                  theme === 'dark' ? 'bg-slate-900/40 border-slate-800 focus-within:border-brand-accent/50' : 'bg-white border-slate-200 focus-within:border-brand-accent/50 shadow-sm'
+                }`}>
+                  <div className="flex items-center px-6 py-2">
+                    <input
+                      type="text"
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      placeholder={t.inputPlaceholder}
+                      className={`flex-1 bg-transparent border-none focus:outline-none text-lg md:text-xl py-4 ${
+                        theme === 'dark' ? 'text-slate-200 placeholder:text-slate-600' : 'text-slate-800 placeholder:text-slate-400'
+                      }`}
+                    />
+                    <button
+                      onClick={handleAIAction}
+                      disabled={isLoading || !input.trim()}
+                      className="flex items-center gap-2 px-6 py-3 rounded-full bg-brand-accent text-white font-bold transition-all hover:bg-brand-accent-hover active:scale-95 disabled:opacity-50"
+                    >
+                      <div className="w-5 h-5 flex items-center justify-center">
+                         {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Play size={18} className="fill-current" />}
+                      </div>
+                      <span className="text-base font-medium">{t.start}</span>
+                    </button>
                   </div>
                 </div>
+              </motion.section>
 
-                {/* Output for Home Chat */}
+              {/* Output for Home Chat */}
+              <div className="max-w-4xl mx-auto w-full">
                 <AnimatePresence>
                   {isLoading && (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
-                      className={`mt-6 border rounded-2xl p-6 shadow-xl flex items-center gap-4 ${theme === 'dark' ? 'bg-brand-card border-slate-800' : 'bg-white border-slate-200'}`}
+                      className={`mt-6 border-2 rounded-2xl p-6 shadow-xl flex items-center gap-4 ${theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}
                     >
                       <div className="flex gap-1">
                         {[0, 1, 2].map((i) => (
@@ -908,19 +868,15 @@ Guidelines:
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className={`mt-6 border rounded-2xl p-6 shadow-xl ${theme === 'dark' ? 'bg-brand-card border-slate-800' : 'bg-white border-slate-200'}`}
+                    className={`mt-6 border-2 rounded-2xl p-6 shadow-xl ${theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}
                   >
                     <div className="flex items-center justify-between mb-6">
                       <div className="flex items-center gap-2 text-brand-accent">
                         <Sparkles size={14} />
                         <span className="text-[10px] font-bold uppercase tracking-widest">Conversation</span>
                       </div>
-                      <div className="flex items-center gap-4">
-                        {/* Preview removed from general chat as per request */}
-                      </div>
                     </div>
                     <div className="flex-1 overflow-y-auto custom-scrollbar">
-                      {/* Preview removed from general chat as per request */}
                       <div className="flex flex-col gap-8">
                         {messages.map((msg, idx) => (
                             <div key={msg.id} className={`flex flex-col gap-3 ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
@@ -938,7 +894,7 @@ Guidelines:
                                     <div className="p-1 rounded bg-brand-accent/20 text-brand-accent">
                                       <Cpu size={12} />
                                     </div>
-                                    <span className="text-[10px] uppercase tracking-widest font-bold">FNB AI PRO</span>
+                                    <span className="text-[10px] uppercase tracking-widest font-bold">{t.title}</span>
                                   </div>
                                   <div className="markdown-body">
                                     <ReactMarkdown
@@ -992,93 +948,102 @@ Guidelines:
                       </div>
                     </motion.div>
                   )}
-              </motion.section>
+              </div>
 
               {/* Feature Grid */}
               <motion.section 
-                variants={{
-                  hidden: { opacity: 0 },
-                  show: {
-                    opacity: 1,
-                    transition: {
-                      staggerChildren: 0.1
-                    }
-                  }
-                }}
-                initial="hidden"
-                whileInView="show"
-                viewport={{ once: true, margin: "-100px" }}
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto w-full px-4"
               >
-                <FeatureGridCard 
-                  icon={Code2}
-                  title={t.codeGenerator}
-                  description={t.codeGenDescription}
-                  iconColor="bg-blue-500"
-                  onClick={() => { setInput(''); setOutput(''); setChatHistory([]); setIsContinuing(false); setActiveTab('generate'); }}
-                  tryItNowLabel={t.tryItNow}
-                />
-                <FeatureGridCard 
-                  icon={Bug}
-                  title={t.smartDebugging}
-                  description="Identify and fix errors with AI assistance"
-                  iconColor="bg-pink-500"
-                  onClick={() => { setInput(''); setOutput(''); setChatHistory([]); setIsContinuing(false); setActiveTab('debug'); }}
-                  tryItNowLabel={t.tryItNow}
-                />
-                <FeatureGridCard 
-                  icon={BookOpen}
-                  title={t.codeExplanation}
-                  description="Understand complex code step-by-step"
-                  iconColor="bg-purple-500"
-                  onClick={() => { setInput(''); setOutput(''); setChatHistory([]); setIsContinuing(false); setActiveTab('explain'); }}
-                  tryItNowLabel={t.tryItNow}
-                />
-                <FeatureGridCard 
-                  icon={TestTube2}
-                  title={t.testGeneration}
-                  description="Automatically create comprehensive test cases"
-                  iconColor="bg-emerald-500"
-                  onClick={() => { setInput(''); setOutput(''); setChatHistory([]); setIsContinuing(false); setActiveTab('test'); }}
-                  tryItNowLabel={t.tryItNow}
-                />
+                {[
+                  { 
+                    id: 'generate', 
+                    label: t.codeGenerator, 
+                    icon: Code2, 
+                    bgColor: 'bg-blue-600',
+                    description: "Translates natural language prompts into functional code in multiple programming language, and more. Includes inline comments and explanations."
+                  },
+                  { 
+                    id: 'debug', 
+                    label: t.smartDebugging, 
+                    icon: Bug, 
+                    bgColor: 'bg-pink-600',
+                    description: "Identify and fix errors with AI assistance"
+                  },
+                  { 
+                    id: 'explain', 
+                    label: t.codeExplanation, 
+                    icon: BookOpen, 
+                    bgColor: 'bg-purple-600',
+                    description: "Understand complex code step-by-step"
+                  },
+                  { 
+                    id: 'test', 
+                    label: t.testGeneration, 
+                    icon: TestTube2, 
+                    bgColor: 'bg-emerald-500', 
+                    description: "Automatically create comprehensive test cases"
+                  },
+                ].map((feature) => (
+                  <FeatureGridCard
+                    key={feature.id}
+                    icon={feature.icon}
+                    title={feature.label}
+                    description={feature.description}
+                    iconBgColor={feature.bgColor}
+                    tryItNowLabel={t.tryItNow}
+                    onClick={() => { 
+                      setInput(''); 
+                      setOutput(''); 
+                      setChatHistory([]); 
+                      setIsContinuing(false); 
+                      setActiveTab(feature.id as Tab); 
+                    }}
+                  />
+                ))}
               </motion.section>
 
               {/* Info Sections */}
               <motion.section 
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-                className="grid grid-cols-1 md:grid-cols-2 gap-6"
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+                className="grid grid-cols-1 md:grid-cols-2 gap-0 border-2 rounded-[32px] overflow-hidden max-w-5xl mx-auto w-full border-slate-800"
               >
-                <div className={`border rounded-2xl p-8 transition-colors ${theme === 'dark' ? 'bg-brand-card/50 border-slate-800' : 'bg-white border-slate-200 shadow-sm'}`}>
-                  <h4 className="text-brand-accent text-xs font-bold uppercase tracking-widest mb-6">{t.forStudents}</h4>
-                  <ul className="flex flex-col gap-4">
+                <div className={`p-10 transition-colors ${theme === 'dark' ? 'bg-[#0a0c14] border-r border-slate-800' : 'bg-slate-900 border-r border-slate-700'} flex flex-col gap-6`}>
+                  <h4 className="text-blue-500 text-sm font-bold uppercase tracking-widest">{t.forStudents}</h4>
+                  <ul className="flex flex-col gap-5">
                     {[
                       "Debug and fix code errors efficiently",
                       "Understand complex algorithms step-by-step",
                       "Learn best practices and optimization",
                       "Get instant coding assistance 24/7"
                     ].map((item, i) => (
-                      <li key={i} className={`flex items-center gap-3 text-sm ${theme === 'dark' ? 'text-slate-300' : 'text-slate-600'}`}>
-                        <CheckCircle2 size={16} className="text-brand-accent" />
+                      <li key={i} className="flex items-center gap-4 text-sm text-slate-400 group">
+                        <div className="w-5 h-5 rounded-full border border-blue-500/30 flex items-center justify-center bg-blue-500/10 group-hover:bg-blue-500 group-hover:text-white transition-all">
+                          <CheckCircle2 size={12} className="text-blue-400 group-hover:text-white" />
+                        </div>
                         {item}
                       </li>
                     ))}
                   </ul>
                 </div>
-                <div className={`border rounded-2xl p-8 transition-colors ${theme === 'dark' ? 'bg-brand-card/50 border-brand-accent/20' : 'bg-white border-brand-accent/20 shadow-sm'}`}>
-                  <h4 className="text-brand-accent text-xs font-bold uppercase tracking-widest mb-6">{t.forEducators}</h4>
-                  <ul className="flex flex-col gap-4">
+                <div className={`p-10 transition-colors ${theme === 'dark' ? 'bg-[#0a0c14]' : 'bg-slate-900'} flex flex-col gap-6`}>
+                  <h4 className="text-blue-500 text-sm font-bold uppercase tracking-widest">{t.forEducators}</h4>
+                  <ul className="flex flex-col gap-5">
                     {[
                       "Generate comprehensive documentation",
                       "Create test cases for assignments",
                       "Provide code examples and explanations",
                       "Save time on content creation"
                     ].map((item, i) => (
-                      <li key={i} className={`flex items-center gap-3 text-sm ${theme === 'dark' ? 'text-slate-300' : 'text-slate-600'}`}>
-                        <CheckCircle2 size={16} className="text-brand-accent" />
+                      <li key={i} className="flex items-center gap-4 text-sm text-slate-400 group">
+                        <div className="w-5 h-5 rounded-full border border-blue-500/30 flex items-center justify-center bg-blue-500/10 group-hover:bg-blue-500 group-hover:text-white transition-all">
+                          <CheckCircle2 size={12} className="text-blue-400 group-hover:text-white" />
+                        </div>
                         {item}
                       </li>
                     ))}
