@@ -118,4 +118,69 @@ app.post("/api/chat", async (req, res) => {
   }
 });
 
+app.post("/api/tts", async (req, res) => {
+  const { text, language = "en" } = req.body;
+  if (!text) return res.status(400).json({ error: "Text is required" });
+
+  console.log(`TTS Request (Vercel): "${text.substring(0, 30)}..." lang=${language}`);
+
+  try {
+    const apiKey = process.env.GEMINI_API_KEY;
+    const langCode = language === "km" ? "km-KH" : "en-US";
+    
+    // Attempt Official Google Cloud TTS first
+    const officialUrl = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`;
+    const officialBody = {
+      input: { text },
+      voice: { languageCode: langCode, ssmlGender: "NEUTRAL" },
+      audioConfig: { audioEncoding: "MP3" }
+    };
+
+    try {
+      const response = await fetch(officialUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(officialBody)
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("TTS Official Success (Vercel)");
+        return res.json({ audioContent: data.audioContent });
+      } else {
+        const errData = (await response.json()) as any;
+        console.warn("TTS Official Failed (Vercel):", errData.error?.message || response.statusText);
+      }
+    } catch (officialErr) {
+      console.warn("TTS Official Fetch Error (Vercel):", officialErr);
+    }
+
+    // Fallback to reliable Google Translate TTS engine (returns binary)
+    console.log("TTS Error (Vercel), falling back to Google Translate engine...");
+    
+    // Google Translate TTS has a limit of ~200 characters per request
+    const safeText = text.substring(0, 200);
+    const fallbackUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(safeText)}&tl=${language === "km" ? "km" : "en"}&client=tw-ob`;
+    
+    const fallbackResponse = await fetch(fallbackUrl, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+      }
+    });
+
+    if (!fallbackResponse.ok) {
+      throw new Error(`TTS fallback failed with status ${fallbackResponse.status}`);
+    }
+
+    const buffer = await fallbackResponse.arrayBuffer();
+    const base64 = Buffer.from(buffer).toString("base64");
+    console.log("TTS Fallback Success (Vercel), base64 length:", base64.length);
+    res.json({ audioContent: base64 });
+
+  } catch (error: any) {
+    console.error("TTS Endpoint Error (Vercel):", error);
+    res.status(500).json({ error: "Speech synthesis failed" });
+  }
+});
+
 export default app;
