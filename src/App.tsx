@@ -40,11 +40,12 @@ import LanguageToggle from './components/LanguageToggle';
 import FeatureCard from './components/FeatureCard';
 import FeatureGridCard from './components/FeatureGridCard';
 import CodeBlock from './components/CodeBlock';
-import InteractiveBackground from './components/InteractiveBackground';
+// import InteractiveBackground from './components/InteractiveBackground';
 import SplashScreen from './components/SplashScreen';
-import CurlyCursor from './components/CurlyCursor';
+// import CurlyCursor from './components/CurlyCursor';
 import CopyButton from './components/CopyButton';
 import TTSButton from './components/TTSButton';
+import TemplateChips from './components/TemplateChips';
 
 type Tab = 'home' | 'chat' | 'generate' | 'debug' | 'test' | 'explain';
 
@@ -65,7 +66,7 @@ export default function App() {
   const [viewMode, setViewMode] = useState<'code' | 'preview'>('code');
   const [previewDevice, setPreviewDevice] = useState<'mobile' | 'desktop'>('desktop');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState(false);
   const [recentChats, setRecentChats] = useState<{ title: string, input: string, output: string, tab: Tab }[]>([]);
   const [chatHistory, setChatHistory] = useState<{ role: 'user' | 'model', parts: { text: string }[] }[]>([]);
   const [isContinuing, setIsContinuing] = useState(false);
@@ -93,8 +94,9 @@ export default function App() {
     scrollToBottom();
   }, [messages, isLoading]);
 
-  const handleAIAction = async () => {
-    if (!input.trim() || isLoading) return;
+  const handleAIAction = async (overrideInput?: string) => {
+    const finalInput = (overrideInput || input).trim();
+    if (!finalInput || isLoading) return;
 
     // If we are on home, switch to chat tab so the user sees the full interface
     if (activeTab === 'home') {
@@ -102,8 +104,8 @@ export default function App() {
     }
 
     setIsLoading(true);
-    const currentInput = input.trim();
-    setInput(''); // Clear input immediately for better UX
+    const currentInput = finalInput;
+    if (!overrideInput) setInput(''); // Clear input if it wasn't an override
 
     const userMsg: Message = {
       id: Date.now().toString(),
@@ -252,12 +254,13 @@ Guidelines:
 `;
       } else if (feature === 'test') {
         systemPrompt += `
-Task: Generate comprehensive unit tests for the provided code.
+Task: Generate comprehensive unit tests for the provided code AND provide practical exercises for the user to test their understanding.
 Guidelines:
 1. Use appropriate frameworks based on the language (e.g., Jest/Vitest for JS/TS, PyTest for Python).
 2. Include edge cases, error handling, and positive/negative scenarios.
-3. Ensure the tests are easy to read and follow standard testing patterns.
-4. Provide a brief explanation of the test coverage.
+3. Provide exercises based on the user's request. Format each exercise within a code block starting with a label like "// Exercise 1.".
+4. Provide the answer/solution for each exercise clearly. The solution MUST explicitly state which exercise it belongs to by referencing its number (e.g., "Solution for Exercise 1:").
+5. Ensure the tests are easy to read and follow standard testing patterns, and provide a brief explanation of the test coverage.
 `;
       } else if (feature === 'explain') {
         systemPrompt += `
@@ -356,6 +359,10 @@ Guidelines:
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleTemplateSelect = (prompt: string) => {
+    setInput(prompt);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -616,7 +623,7 @@ Guidelines:
 
   return (
     <div className={`h-screen flex overflow-hidden font-sans transition-colors duration-300 ${theme} ${theme === 'dark' ? 'bg-brand-bg text-slate-200' : 'bg-slate-50 text-slate-900'}`}>
-      <AnimatePresence mode="wait">
+      {/* <AnimatePresence mode="wait">
         {showSplash && (
           <SplashScreen
             key="splash"
@@ -624,10 +631,10 @@ Guidelines:
             onComplete={() => setShowSplash(false)}
           />
         )}
-      </AnimatePresence>
+      </AnimatePresence> */}
 
-      <InteractiveBackground theme={theme as 'light' | 'dark'} />
-      <CurlyCursor />
+      {/* <InteractiveBackground theme={theme as 'light' | 'dark'} /> */}
+      {/* <CurlyCursor /> */}
 
       {/* Mobile Overlay */}
       {isSidebarOpen && (
@@ -823,12 +830,12 @@ Guidelines:
                           }`}
                       />
                       <button
-                        onClick={handleAIAction}
+                        onClick={() => handleAIAction()}
                         disabled={isLoading || !input.trim()}
                         className="flex items-center gap-2 px-6 py-3 rounded-full bg-brand-accent text-white font-bold transition-all hover:bg-brand-accent-hover active:scale-95 disabled:opacity-50"
                       >
                         <div className="w-5 h-5 flex items-center justify-center">
-                          {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Play size={18} className="fill-current" />}
+                          {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Sparkles size={18} className="fill-current" />}
                         </div>
                         <span className="text-base font-medium">{t.start}</span>
                       </button>
@@ -1085,6 +1092,12 @@ Guidelines:
                   {/* Input Area */}
                   <div className="lg:col-span-5 flex flex-col gap-6">
                     <div className="flex-1 flex flex-col gap-4">
+                      {activeTab === 'generate' && (
+                        <TemplateChips 
+                          onSelect={handleTemplateSelect} 
+                          theme={theme} 
+                        />
+                      )}
                       <div className="flex-1 relative min-h-[400px]">
                         <textarea
                           ref={inputRef}
@@ -1103,7 +1116,7 @@ Guidelines:
                             <Trash2 size={18} />
                           </button>
                           <button
-                            onClick={handleAIAction}
+                            onClick={() => handleAIAction()}
                             disabled={isLoading || !input.trim()}
                             className="flex items-center gap-2 px-6 py-2 rounded-lg bg-brand-accent text-white text-xs font-bold uppercase tracking-widest hover:bg-brand-accent-hover transition-all disabled:opacity-50"
                           >
